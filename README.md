@@ -2,4 +2,4 @@ Copy pictures from a camera card to a folder on a local HD and organizes files i
 Use:
 ```
 python copy_pictures.py source_folder dest_folder -folder-name "Vacation"
-'''
+```
