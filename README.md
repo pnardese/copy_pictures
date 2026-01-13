@@ -1,18 +1,19 @@
 Copy pictures from a camera card to a folder on a local HD and organizes files in folders with a date name. Optional tag to add a description to folder name, e.g. "2025-12-31 - Vacation"
 Using the --date tag allows to choose specific dates to be copied.
+
 Use:
 
-# Normal usage (copies all pictures)
+## Normal usage (copies all pictures)
 ```
 python copy_pictures.py /media/camera /home/user/photos --folder-name "Vacation"
 ```
 
-# Interactive date selection
+## Interactive date selection
 ```
 python copy_pictures.py /media/camera /home/user/photos --date
 ```
 
-# With both date selection and folder name
+## With both date selection and folder name
 ```
 python copy_pictures.py /media/camera /home/user/photos --date --folder-name "Vacation"
 ```
