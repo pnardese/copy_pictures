@@ -4,6 +4,28 @@ import shutil
 import exifread
 import argparse
 
+# Supported media file extensions
+SUPPORTED_EXTENSIONS = {
+    # Image formats
+    '.jpg', '.jpeg', '.png', '.gif', '.tiff', '.tif', '.bmp', '.webp',
+    '.heic', '.heif', '.ico', '.svg',
+    # RAW formats
+    '.raw', '.cr2', '.cr3', '.nef', '.arw', '.dng', '.orf', '.rw2',
+    '.pef', '.srw', '.raf', '.3fr', '.kdc', '.dcr', '.mrw', '.rwl',
+    # Photoshop / Adobe formats
+    '.psd', '.psb', '.ai', '.eps',
+    # Video formats
+    '.mp4', '.mov', '.avi', '.mkv', '.wmv', '.flv', '.webm', '.m4v',
+    '.mpg', '.mpeg', '.3gp', '.mts', '.m2ts', '.vob', '.ogv',
+    # VFX / CGI formats
+    '.exr', '.hdr', '.dpx', '.cin',
+}
+
+def is_supported_file(filename):
+    """Check if file has a supported media extension."""
+    ext = os.path.splitext(filename)[1].lower()
+    return ext in SUPPORTED_EXTENSIONS
+
 def get_date_taken(image_path):
     """Returns (year, date) tuple, e.g. ('2024', '2024-01-15') or (None, None)."""
     try:
@@ -19,31 +41,35 @@ def get_date_taken(image_path):
         print(f"Error reading metadata from {image_path}: {e}")
     return None, None
 
-def copy_pictures(source_folder, destination_folder, nodate=False):
+def copy_pictures(source_folder, destination_folder):
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
 
-    # Collect all files recursively
-    image_files = []
+    # Collect all supported media files recursively
+    media_files = []
+    skipped_files = 0
     for root, dirs, files in os.walk(source_folder):
         for filename in files:
-            image_files.append(os.path.join(root, filename))
+            if is_supported_file(filename):
+                media_files.append(os.path.join(root, filename))
+            else:
+                skipped_files += 1
 
-    total_files = len(image_files)
+    if skipped_files > 0:
+        print(f"Skipped {skipped_files} non-media files")
+
+    total_files = len(media_files)
     copied_files = 0
+    nodate_files = 0
 
-    for file_path in image_files:
+    for file_path in media_files:
         filename = os.path.basename(file_path)
         year, date = get_date_taken(file_path)
 
-        if nodate:
-            if year is not None:
-                continue
+        if year is None:
             target_folder = os.path.join(destination_folder, "nodate")
+            nodate_files += 1
         else:
-            if year is None:
-                print(f"Could not determine date for {filename}, skipping.")
-                continue
             target_folder = os.path.join(destination_folder, year, date)
 
         if not os.path.exists(target_folder):
@@ -56,13 +82,12 @@ def copy_pictures(source_folder, destination_folder, nodate=False):
         except Exception as e:
             print(f"Error copying {filename}: {e}")
 
-    print(f"Copy complete. {copied_files}/{total_files} pictures copied.")
+    print(f"Copy complete. {copied_files}/{total_files} media files copied ({nodate_files} without date info).")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Copy pictures from a camera card to a disk, organizing by year and date.")
     parser.add_argument("source_folder", help="Source folder with pictures (scans subfolders recursively)")
     parser.add_argument("destination_folder", help="Destination folder on disk")
-    parser.add_argument("--nodate", action="store_true", help="Copy only files without date metadata to a 'nodate' folder")
 
     args = parser.parse_args()
 
@@ -70,4 +95,4 @@ if __name__ == "__main__":
         print(f"Source folder does not exist: {args.source_folder}")
         sys.exit(1)
 
-    copy_pictures(args.source_folder, args.destination_folder, nodate=args.nodate)
+    copy_pictures(args.source_folder, args.destination_folder)
