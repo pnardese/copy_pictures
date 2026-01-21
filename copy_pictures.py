@@ -61,6 +61,7 @@ def copy_pictures(source_folder, destination_folder):
     total_files = len(media_files)
     copied_files = 0
     nodate_files = 0
+    already_copied = 0
 
     for file_path in media_files:
         filename = os.path.basename(file_path)
@@ -72,17 +73,25 @@ def copy_pictures(source_folder, destination_folder):
         else:
             target_folder = os.path.join(destination_folder, year, date)
 
+        destination_path = os.path.join(target_folder, filename)
+
+        # Skip if file already exists at destination
+        if os.path.exists(destination_path):
+            already_copied += 1
+            print(f"Skipping (already exists): {filename}")
+            continue
+
         if not os.path.exists(target_folder):
             os.makedirs(target_folder)
 
         try:
             shutil.copy2(file_path, target_folder)
             copied_files += 1
-            print(f"Copying {copied_files}/{total_files}: {filename}")
+            print(f"Copying {copied_files}/{total_files - already_copied}: {filename}")
         except Exception as e:
             print(f"Error copying {filename}: {e}")
 
-    print(f"Copy complete. {copied_files}/{total_files} media files copied ({nodate_files} without date info).")
+    print(f"Copy complete. {copied_files} files copied, {already_copied} skipped (already exist), {nodate_files} without date info.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Copy pictures from a camera card to a disk, organizing by year and date.")

@@ -8,6 +8,7 @@ A Python CLI utility for copying pictures and media files from a camera card to 
 - Organizes media into `year/date` folder structure (e.g., `2024/2024-01-15/`)
 - Recursively scans source folders including subfolders
 - Automatically copies files without date metadata to a `nodate` folder
+- Skips files that already exist at the destination (duplicate detection)
 - Skips non-media files (like `.DS_Store`, system files, etc.)
 - Progress output during copy operation
 
