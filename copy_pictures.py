@@ -87,13 +87,13 @@ def copy_pictures(source_folder, destination_folder):
         try:
             shutil.copy2(file_path, target_folder)
             copied_files += 1
-            print(f"Copying {copied_files}/{total_files - already_copied}: {filename}")
+            print(f"Copying {copied_files}/{total_files - already_copied}: {filename} -> {destination_path}")
         except Exception as e:
             print(f"Error copying {filename}: {e}")
 
     print(f"Copy complete. {copied_files} files copied, {already_copied} skipped (already exist), {nodate_files} without date info.")
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Copy pictures from a camera card to a disk, organizing by year and date.")
     parser.add_argument("source_folder", help="Source folder with pictures (scans subfolders recursively)")
     parser.add_argument("destination_folder", help="Destination folder on disk")
@@ -105,3 +105,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     copy_pictures(args.source_folder, args.destination_folder)
+
+if __name__ == "__main__":
+    main()
